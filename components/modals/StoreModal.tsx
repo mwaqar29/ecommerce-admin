@@ -1,13 +1,13 @@
-"use client";
+"use client"
 
-import * as z from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import axios from "axios";
+import * as z from "zod"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import axios from "axios"
 
-import { useStoreModal } from "@/hooks/useStoreModal";
-import { Modal } from "@/components/ui/modal";
+import { useStoreModal } from "@/hooks/useStoreModal"
+import { Modal } from "@/components/ui/modal"
 import {
   Form,
   FormControl,
@@ -15,41 +15,41 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { toast } from "react-hot-toast";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { toast } from "react-hot-toast"
 
 const formSchema = z.object({
   name: z.string().min(1),
-});
+})
 
 export const StoreModal = () => {
-  const storeModal = useStoreModal();
+  const storeModal = useStoreModal()
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
     },
-  });
+  })
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    console.log(values)
     try {
-      setLoading(true);
+      setLoading(true)
 
-      const response = await axios.post("/api/stores", values);
+      const response = await axios.post("/api/stores", values)
 
-      toast.success("Store created!");
+      toast.success("Store created!")
     } catch (error) {
-      toast.error("Something went wrong!");
+      toast.error("Something went wrong!")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <Modal
@@ -96,5 +96,5 @@ export const StoreModal = () => {
         </div>
       </div>
     </Modal>
-  );
-};
+  )
+}
