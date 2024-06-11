@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input"
 import { AlertModal } from "@/components/modals/AlertModal"
 import { ApiAlert } from "@/components/ui/api-alert"
 import TooltipComponent from "@/components/ui/tooltip-component"
+import { useOrigin } from "@/hooks/useOrigin"
 
 interface SettingsFormProps {
   initialData: Store
@@ -39,6 +40,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   const [loading, setLoading] = useState(false)
   const params = useParams()
   const router = useRouter()
+  const origin = useOrigin()
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(formSchema),
