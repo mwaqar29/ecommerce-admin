@@ -6,13 +6,13 @@ import prisma from "@/lib/prisma"
 export async function POST(req: Request) {
   try {
     const { userId } = auth()
-    console.log(userId)
+
     const body = await req.json()
-    console.log(body)
+
     const { name } = body
 
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 })
+      return new NextResponse("Unauthenticated", { status: 401 })
     }
 
     if (!name) {

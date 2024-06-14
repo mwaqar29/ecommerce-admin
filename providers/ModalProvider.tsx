@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 
 import { StoreModal } from "@/components/modals/StoreModal"
+import ImageUploadModal from "@/components/modals/ImageUploadModal"
 
 export const ModalProvider = () => {
   const [isMounted, setIsMounted] = useState(false)
@@ -16,6 +17,7 @@ export const ModalProvider = () => {
   return (
     <>
       <StoreModal />
+      <ImageUploadModal />
     </>
   )
 }
