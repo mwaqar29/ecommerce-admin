@@ -24,7 +24,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { AlertModal } from "@/components/modals/AlertModal"
 import TooltipComponent from "@/components/ui/tooltip-component"
-import { useOrigin } from "@/hooks/useOrigin"
 import ImageUpload from "@/components/ui/image-upload"
 import { useImageUploadModal } from "@/hooks/useImageUploadModal"
 
@@ -45,7 +44,6 @@ const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
   const { imageUrl, setImageUrl } = useImageUploadModal()
   const params = useParams()
   const router = useRouter()
-  const origin = useOrigin()
 
   const title = initialData ? "Edit Billboard" : "Create Billboard"
   const description = initialData ? "Edit the Billboard" : "Add a new billboard"
@@ -88,7 +86,7 @@ const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
         `/api/${params.storeId}/billboards/${params.billboardId}`,
       )
       router.refresh()
-      router.push("/")
+      router.push(`/${params.storeId}/billboards`)
       toast.success("Billboard deleted.")
     } catch (error) {
       toast.error("Make sure you removed all categories using this billboard.")
@@ -98,25 +96,9 @@ const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
     }
   }
 
-  // Will be used when entire billboard is deleted
-  const handleImgRemove = async (url: string) => {
-    if (!supabase || !url) return
-    const urlArr = url.split("/")
-    const path = `${urlArr[urlArr.length - 2]}/${urlArr[urlArr.length - 1]}`
-    const { error } = await supabase.storage
-      .from("ecommerce-images")
-      .remove([path])
-    if (error) {
-      console.log(error)
-      toast.error("Error in deleting image!")
-    } else {
-      setImageUrl("")
-      toast.success("Image deleted Successfully.")
-    }
-  }
-
   useEffect(() => {
     if (initialData) setImageUrl(initialData.imageUrl)
+    else setImageUrl("")
   }, [initialData, setImageUrl])
 
   useEffect(() => {
@@ -190,12 +172,20 @@ const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
             />
           </div>
 
-          <Button type="submit" disabled={loading} className="ml-auto">
+          <Button type="submit" disabled={loading} className="ml-auto mr-5">
             {action}
+          </Button>
+          <Button
+            type="button"
+            disabled={loading}
+            className="ml-auto"
+            variant="outline"
+            onClick={() => router.push(`/${params.storeId}/billboards`)}
+          >
+            Back
           </Button>
         </form>
       </Form>
-      <Separator />
     </>
   )
 }

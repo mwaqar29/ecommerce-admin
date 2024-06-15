@@ -7,10 +7,10 @@ import { useCallback, useEffect, useState } from "react"
 import Uppy, { UppyFile } from "@uppy/core"
 import { Dashboard } from "@uppy/react"
 import toast from "react-hot-toast"
+import supabase from "@/lib/supabase"
 
 import { useImageUploadModal } from "@/hooks/useImageUploadModal"
 import { Modal } from "@/components/ui/modal"
-import supabase from "@/lib/supabase"
 
 const ImageUploadModal = () => {
   const imageUploadModal = useImageUploadModal()
