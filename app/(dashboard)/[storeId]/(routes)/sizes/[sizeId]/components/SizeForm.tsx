@@ -10,7 +10,7 @@ import { useParams, useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import Heading from "@/components/ui/heading"
-import { Billboard, Category } from "@prisma/client"
+import { Size } from "@prisma/client"
 import { Trash } from "lucide-react"
 import { useState } from "react"
 import {
@@ -24,61 +24,49 @@ import {
 import { Input } from "@/components/ui/input"
 import { AlertModal } from "@/components/modals/AlertModal"
 import TooltipComponent from "@/components/ui/tooltip-component"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import ImageUpload from "@/components/ui/image-upload"
+import { useImageUploadModal } from "@/hooks/useImageUploadModal"
 
 const formSchema = z.object({
   name: z.string().min(1),
-  billboardId: z.string().min(1),
+  value: z.string().min(1),
 })
 
-type CategoryFormValues = z.infer<typeof formSchema>
+type SizeFormValues = z.infer<typeof formSchema>
 
-interface CategoryFormProps {
-  initialData: Category | null
-  billboards: Billboard[]
+interface SizeFormProps {
+  initialData: Size | null
 }
 
-const CategoryForm: React.FC<CategoryFormProps> = ({
-  initialData,
-  billboards,
-}) => {
+const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const params = useParams()
   const router = useRouter()
 
-  const title = initialData ? "Edit Category" : "Create Category"
-  const description = initialData ? "Edit the Category" : "Add a new category"
-  const toastMsg = initialData ? "Category Updated." : "Category Created."
+  const title = initialData ? "Edit Size" : "Create Size"
+  const description = initialData ? "Edit the Size" : "Add a new Size"
+  const toastMsg = initialData ? "Size Updated." : "Size Created."
   const action = initialData ? "Save Changes" : "Create"
 
-  const form = useForm<CategoryFormValues>({
+  const form = useForm<SizeFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
       name: "",
-      billboardId: "",
+      value: "",
     },
   })
 
-  const onSubmit = async (data: CategoryFormValues) => {
+  const onSubmit = async (data: SizeFormValues) => {
     try {
       setLoading(true)
       if (initialData) {
-        await axios.patch(
-          `/api/${params.storeId}/categories/${params.categoryId}`,
-          data,
-        )
+        await axios.patch(`/api/${params.storeId}/sizes/${params.sizeId}`, data)
       } else {
-        await axios.post(`/api/${params.storeId}/categories`, data)
+        await axios.post(`/api/${params.storeId}/sizes`, data)
       }
       router.refresh()
-      router.push(`/${params.storeId}/categories`)
+      router.push(`/${params.storeId}/sizes`)
       toast.success(toastMsg)
     } catch (error) {
       toast.error("Something went wrong!")
@@ -90,16 +78,12 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   const onDelete = async () => {
     try {
       setLoading(true)
-      await axios.delete(
-        `/api/${params.storeId}/categories/${params.categoryId}`,
-      )
+      await axios.delete(`/api/${params.storeId}/sizes/${params.sizeId}`)
       router.refresh()
-      router.push(`/${params.storeId}/categories`)
-      toast.success("Category deleted.")
+      router.push(`/${params.storeId}/sizes`)
+      toast.success("Size deleted.")
     } catch (error) {
-      toast.error(
-        "Make sure you remove all products using this category first.",
-      )
+      toast.error("Make sure you remove all products using this size.")
     } finally {
       setLoading(false)
       setOpen(false)
@@ -118,7 +102,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
         <Heading title={title} description={description} />
         {initialData && (
           <TooltipComponent
-            content=<p>Delete Category</p>
+            content=<p>Delete Size</p>
             trigger=<Button
               variant="destructive"
               size="icon"
@@ -142,11 +126,11 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Label</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder="Enter Category Name"
+                      placeholder="Enter Size Name"
                       {...field}
                     />
                   </FormControl>
@@ -156,32 +140,17 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             />
             <FormField
               control={form.control}
-              name="billboardId"
+              name="value"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Billboard</FormLabel>
-                  <Select
-                    disabled={loading}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="Select a billboard"
-                        ></SelectValue>
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {billboards.map((billboard) => (
-                        <SelectItem key={billboard.id} value={billboard.id}>
-                          {billboard.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormLabel>Value</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="Enter Size value"
+                      {...field}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -196,7 +165,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             disabled={loading}
             className="ml-auto"
             variant="outline"
-            onClick={() => router.push(`/${params.storeId}/categories`)}
+            onClick={() => router.push(`/${params.storeId}/sizes`)}
           >
             Back
           </Button>
@@ -206,4 +175,4 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   )
 }
 
-export default CategoryForm
+export default SizeForm
