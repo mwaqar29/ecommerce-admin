@@ -3,7 +3,7 @@
 import "@uppy/core/dist/style.min.css"
 import "@uppy/dashboard/dist/style.min.css"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import Uppy, { UppyFile } from "@uppy/core"
 import { Dashboard } from "@uppy/react"
 import toast from "react-hot-toast"
@@ -14,25 +14,28 @@ import { Modal } from "@/components/ui/modal"
 
 const ImageUploadModal = () => {
   const imageUploadModal = useImageUploadModal()
-  const [selectedFile, setSelectedFile] = useState<UppyFile | null>()
+  const [selectedFiles, setSelectedFiles] = useState<UppyFile[]>([])
 
-  // IMPORTANT: passing an initializer function to prevent Uppy from being reinstantiated on every render.
-  const [uppy] = useState(
-    () =>
-      new Uppy({
-        restrictions: {
-          maxFileSize: 5000000,
-          maxNumberOfFiles: 1,
-          allowedFileTypes: ["image/*"],
-        },
-      }),
-  )
+  // IMPORTANT: pasing an initializer function to prevent Uppy from being reinstantiated on every render except when the dependencies change.
+  const uppy = useMemo(() => {
+    return new Uppy({
+      restrictions: {
+        maxFileSize: 5000000,
+        maxNumberOfFiles: imageUploadModal.maxFiles,
+        allowedFileTypes: ["image/*"],
+      },
+    })
+  }, [imageUploadModal.maxFiles])
 
   const handleModalClose = useCallback(() => {
-    if (selectedFile) uppy.removeFile(selectedFile.id)
+    if (selectedFiles?.length) {
+      selectedFiles.forEach((imgFile) => {
+        uppy.removeFile(imgFile.id)
+      })
+    }
     imageUploadModal.onClose()
-    setSelectedFile(null)
-  }, [imageUploadModal, selectedFile, uppy])
+    setSelectedFiles([])
+  }, [imageUploadModal, selectedFiles, uppy])
 
   useEffect(() => {
     async function uploadImage(file: File) {
@@ -44,9 +47,7 @@ const ImageUploadModal = () => {
         console.log(error)
         toast.error("Error in uploading image!")
       } else {
-        getImage(data.path)
-        toast.success("Image Uploaded Successfully.")
-        handleModalClose()
+        return data.path
       }
     }
 
@@ -55,31 +56,52 @@ const ImageUploadModal = () => {
       const { data } = supabase.storage
         .from("ecommerce-images")
         .getPublicUrl(path)
-      imageUploadModal.setImageUrl(data.publicUrl)
+
+      return data.publicUrl
     }
 
-    const onUppyFileAdd = (file: UppyFile) => {
-      setSelectedFile(file as UppyFile)
+    const onUppyFileAdd = (files: UppyFile[]) => {
+      let imgArr: UppyFile[] = JSON.parse(JSON.stringify(selectedFiles))
+      imgArr = [...imgArr, ...files]
+      setSelectedFiles(imgArr)
     }
 
     const onUppyFileRemoved = (file: UppyFile) => {
-      setSelectedFile(null)
+      let imgArr: UppyFile[] = JSON.parse(JSON.stringify(selectedFiles))
+      imgArr = imgArr.filter((img) => img.id === file.id)
+      setSelectedFiles(imgArr)
     }
 
-    const onUppyFileUpload = () => {
-      uploadImage(selectedFile?.data as File)
+    const onUppyFileUpload = async () => {
+      if (!selectedFiles?.length) return
+      const uploadPromises = selectedFiles.map((imgFile) =>
+        uploadImage(imgFile?.data as File),
+      )
+      try {
+        const results = await Promise.all(uploadPromises)
+        toast.success("Image(s) Uploaded Succesfully!")
+        const imgUrlArr = [...imageUploadModal.imageUrls]
+        results.forEach((path) => {
+          const imgUrl = getImage(path!)
+          if (imgUrl) imgUrlArr.push(imgUrl)
+        })
+        imageUploadModal.setImageUrls(imgUrlArr)
+        handleModalClose()
+      } catch (error) {
+        console.log("Something went wrong in uploading images!")
+      }
     }
 
-    uppy.on("file-added", onUppyFileAdd)
+    uppy.on("files-added", onUppyFileAdd)
     uppy.on("file-removed", onUppyFileRemoved)
     uppy.on("upload", onUppyFileUpload)
 
     return () => {
-      uppy.off("file-added", onUppyFileAdd)
+      uppy.off("files-added", onUppyFileAdd)
       uppy.off("file-removed", onUppyFileRemoved)
       uppy.off("upload", onUppyFileUpload)
     }
-  }, [handleModalClose, imageUploadModal, selectedFile, uppy])
+  }, [handleModalClose, imageUploadModal, selectedFiles, uppy])
 
   return (
     <Modal
@@ -93,7 +115,7 @@ const ImageUploadModal = () => {
         uppy={uppy}
         height={400}
         showProgressDetails={true}
-        note="Only 1 image is allowed. Max file size limit: 5MB."
+        note={imageUploadModal.note}
         locale={{
           strings: {
             dropPasteFiles: "Drop image here or %{browseFiles}",

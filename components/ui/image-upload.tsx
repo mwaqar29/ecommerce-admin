@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { ImagePlus, Trash } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { useImageUploadModal } from "@/hooks/useImageUploadModal"

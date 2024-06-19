@@ -41,7 +41,8 @@ interface BillboardFormProps {
 const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const { imageUrl, setImageUrl } = useImageUploadModal()
+  const { imageUrls, setImageUrls, setMaxFiles, setNote } =
+    useImageUploadModal()
   const params = useParams()
   const router = useRouter()
 
@@ -97,13 +98,15 @@ const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
   }
 
   useEffect(() => {
-    if (initialData) setImageUrl(initialData.imageUrl)
-    else setImageUrl("")
-  }, [initialData, setImageUrl])
+    setMaxFiles(1)
+    setNote("Only 1 image is allowed. Max file size limit: 5MB.")
+    if (initialData) setImageUrls([initialData.imageUrl])
+    else setImageUrls([])
+  }, [initialData, setImageUrls, setMaxFiles, setNote])
 
   useEffect(() => {
-    form.setValue("imageUrl", imageUrl)
-  }, [form, imageUrl])
+    form.setValue("imageUrl", imageUrls[0])
+  }, [form, imageUrls])
 
   return (
     <>
