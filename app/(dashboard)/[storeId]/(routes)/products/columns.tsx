@@ -23,10 +23,12 @@ export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "isArchived",
     header: "Archived",
+    cell: ({ row }) => <>{row.original.isArchived ? "Yes" : "No"}</>,
   },
   {
     accessorKey: "isFeatured",
     header: "Featured",
+    cell: ({ row }) => <>{row.original.isFeatured ? "Yes" : "No"}</>,
   },
   {
     accessorKey: "price",
