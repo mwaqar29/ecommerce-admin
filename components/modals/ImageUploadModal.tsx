@@ -80,12 +80,17 @@ const ImageUploadModal = () => {
       try {
         const results = await Promise.all(uploadPromises)
         toast.success("Image(s) Uploaded Succesfully!")
-        const imgUrlArr = [...imageUploadModal.imageUrls]
-        results.forEach((path) => {
-          const imgUrl = getImage(path!)
-          if (imgUrl) imgUrlArr.push(imgUrl)
-        })
-        imageUploadModal.setImageUrls(imgUrlArr)
+        if (imageUploadModal.maxFiles == 1) {
+          const imgUrl = getImage(results[0]!)
+          if (imgUrl) imageUploadModal.setImageUrls([imgUrl])
+        } else {
+          const imgUrlArr = [...imageUploadModal.imageUrls]
+          results.forEach((path) => {
+            const imgUrl = getImage(path!)
+            if (imgUrl) imgUrlArr.push(imgUrl)
+          })
+          imageUploadModal.setImageUrls(imgUrlArr)
+        }
         handleModalClose()
       } catch (error) {
         console.log("Something went wrong in uploading images!")
