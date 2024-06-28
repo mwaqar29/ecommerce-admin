@@ -8,6 +8,7 @@ import Uppy, { UppyFile } from "@uppy/core"
 import { Dashboard } from "@uppy/react"
 import toast from "react-hot-toast"
 import supabase from "@/lib/supabase"
+import { useTheme } from "next-themes"
 
 import { useImageUploadModal } from "@/hooks/useImageUploadModal"
 import { Modal } from "@/components/ui/modal"
@@ -15,6 +16,7 @@ import { Modal } from "@/components/ui/modal"
 const ImageUploadModal = () => {
   const imageUploadModal = useImageUploadModal()
   const [selectedFiles, setSelectedFiles] = useState<UppyFile[]>([])
+  const { theme } = useTheme()
 
   // IMPORTANT: pasing an initializer function to prevent Uppy from being reinstantiated on every render except when the dependencies change.
   const uppy = useMemo(() => {
@@ -127,7 +129,9 @@ const ImageUploadModal = () => {
             dropHint: "Drop your image here",
           },
         }}
-        theme="light"
+        theme={
+          theme === "system" ? "auto" : theme === "dark" ? "dark" : "light"
+        }
       />
     </Modal>
   )
