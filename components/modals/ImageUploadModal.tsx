@@ -47,7 +47,8 @@ const ImageUploadModal = () => {
         .upload(file.name, file)
       if (error) {
         console.log(error)
-        toast.error("Error in uploading image!")
+        toast.error(error.message)
+        throw new Error(error.message)
       } else {
         return data.path
       }
