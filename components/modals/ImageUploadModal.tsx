@@ -16,7 +16,7 @@ import { Modal } from "@/components/ui/modal"
 const ImageUploadModal = () => {
   const imageUploadModal = useImageUploadModal()
   const [selectedFiles, setSelectedFiles] = useState<UppyFile[]>([])
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   // IMPORTANT: pasing an initializer function to prevent Uppy from being reinstantiated on every render except when the dependencies change.
   const uppy = useMemo(() => {
@@ -129,9 +129,7 @@ const ImageUploadModal = () => {
             dropHint: "Drop your image here",
           },
         }}
-        theme={
-          theme === "system" ? "auto" : theme === "dark" ? "dark" : "light"
-        }
+        theme={resolvedTheme === "dark" ? "dark" : "light"}
       />
     </Modal>
   )

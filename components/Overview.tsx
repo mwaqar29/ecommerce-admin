@@ -8,20 +8,20 @@ interface OverviewProps {
 }
 
 const Overview: React.FC<OverviewProps> = ({ data }) => {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   return (
     <ResponsiveContainer width="100%" height={350}>
       <BarChart data={data}>
         <XAxis
           dataKey="name"
-          stroke={theme === "dark" ? "#cfcfcf" : "#123123"}
+          stroke={resolvedTheme === "dark" ? "#cfcfcf" : "#123123"}
           fontSize={12}
           tickLine={false}
           axisLine={false}
         />
         <YAxis
-          stroke={theme === "dark" ? "#cfcfcf" : "#123123"}
+          stroke={resolvedTheme === "dark" ? "#cfcfcf" : "#123123"}
           fontSize={12}
           tickLine={false}
           axisLine={false}
