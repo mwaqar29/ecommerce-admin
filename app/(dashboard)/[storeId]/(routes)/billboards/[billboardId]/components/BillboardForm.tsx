@@ -26,6 +26,7 @@ import { AlertModal } from "@/components/modals/AlertModal"
 import TooltipComponent from "@/components/ui/tooltip-component"
 import ImageUpload from "@/components/ui/image-upload"
 import { useImageUploadModal } from "@/hooks/useImageUploadModal"
+import { revalidate } from "@/actions/revalidate"
 
 const formSchema = z.object({
   label: z.string().min(1),
@@ -70,7 +71,7 @@ const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
       } else {
         await axios.post(`/api/${params.storeId}/billboards`, data)
       }
-      router.refresh()
+      await revalidate(`/${params.storeId}/billboards`)
       router.push(`/${params.storeId}/billboards`)
       toast.success(toastMsg)
     } catch (error) {
@@ -86,7 +87,7 @@ const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
       await axios.delete(
         `/api/${params.storeId}/billboards/${params.billboardId}`,
       )
-      router.refresh()
+      await revalidate(`/${params.storeId}/billboards`)
       router.push(`/${params.storeId}/billboards`)
       toast.success("Billboard deleted.")
     } catch (error) {

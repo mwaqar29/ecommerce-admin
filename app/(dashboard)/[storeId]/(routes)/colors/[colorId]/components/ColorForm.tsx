@@ -24,6 +24,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { AlertModal } from "@/components/modals/AlertModal"
 import TooltipComponent from "@/components/ui/tooltip-component"
+import { revalidate } from "@/actions/revalidate"
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -68,7 +69,7 @@ const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
       } else {
         await axios.post(`/api/${params.storeId}/colors`, data)
       }
-      router.refresh()
+      await revalidate(`/${params.storeId}/colors`)
       router.push(`/${params.storeId}/colors`)
       toast.success(toastMsg)
     } catch (error) {
@@ -82,7 +83,7 @@ const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
     try {
       setLoading(true)
       await axios.delete(`/api/${params.storeId}/colors/${params.colorId}`)
-      router.refresh()
+      await revalidate(`/${params.storeId}/colors`)
       router.push(`/${params.storeId}/colors`)
       toast.success("Color deleted.")
     } catch (error) {

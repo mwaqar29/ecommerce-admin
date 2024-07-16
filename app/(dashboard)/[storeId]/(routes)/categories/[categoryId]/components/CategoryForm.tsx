@@ -31,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { revalidate } from "@/actions/revalidate"
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -77,7 +78,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       } else {
         await axios.post(`/api/${params.storeId}/categories`, data)
       }
-      router.refresh()
+      await revalidate(`/${params.storeId}/categories`)
       router.push(`/${params.storeId}/categories`)
       toast.success(toastMsg)
     } catch (error) {
@@ -93,7 +94,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       await axios.delete(
         `/api/${params.storeId}/categories/${params.categoryId}`,
       )
-      router.refresh()
+      await revalidate(`/${params.storeId}/categories`)
       router.push(`/${params.storeId}/categories`)
       toast.success("Category deleted.")
     } catch (error) {

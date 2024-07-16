@@ -34,6 +34,7 @@ import ImageUpload from "@/components/ui/image-upload"
 import TooltipComponent from "@/components/ui/tooltip-component"
 import { AlertModal } from "@/components/modals/AlertModal"
 import { useImageUploadModal } from "@/hooks/useImageUploadModal"
+import { revalidate } from "@/actions/revalidate"
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -106,7 +107,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       } else {
         await axios.post(`/api/${params.storeId}/products`, data)
       }
-      router.refresh()
+      await revalidate(`/${params.storeId}/products`)
       router.push(`/${params.storeId}/products`)
       toast.success(toastMsg)
     } catch (error) {
@@ -120,7 +121,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     try {
       setLoading(true)
       await axios.delete(`/api/${params.storeId}/products/${params.productId}`)
-      router.refresh()
+      await revalidate(`/${params.storeId}/products`)
       router.push(`/${params.storeId}/products`)
       toast.success("Product deleted.")
     } catch (error) {

@@ -24,6 +24,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { AlertModal } from "@/components/modals/AlertModal"
 import TooltipComponent from "@/components/ui/tooltip-component"
+import { revalidate } from "@/actions/revalidate"
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -63,7 +64,7 @@ const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
       } else {
         await axios.post(`/api/${params.storeId}/sizes`, data)
       }
-      router.refresh()
+      await revalidate(`/${params.storeId}/sizes`)
       router.push(`/${params.storeId}/sizes`)
       toast.success(toastMsg)
     } catch (error) {
@@ -77,7 +78,7 @@ const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
     try {
       setLoading(true)
       await axios.delete(`/api/${params.storeId}/sizes/${params.sizeId}`)
-      router.refresh()
+      await revalidate(`/${params.storeId}/sizes`)
       router.push(`/${params.storeId}/sizes`)
       toast.success("Size deleted.")
     } catch (error) {
