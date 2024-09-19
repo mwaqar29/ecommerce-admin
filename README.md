@@ -5,6 +5,7 @@
 #### Built With
 
 - Next 14
+- Shadcn UI
 - Tailwind
 - Zustand
 - Clerk Authentication
