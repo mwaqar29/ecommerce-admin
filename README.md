@@ -17,4 +17,6 @@
 - React Hook Form
 - Zod
 
+Github Link to [E-commerce Store project](https://github.com/mwaqar29/ecommerce-store#readme)
+
 ##### Thanks for visiting!
